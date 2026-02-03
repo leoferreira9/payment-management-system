@@ -1,7 +1,6 @@
 package leonardo.payment_management_system.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 
@@ -19,7 +18,6 @@ public class PaymentRecord {
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
-    @DecimalMin("0.0")
     @Column(nullable = false, precision = 9, scale = 2)
     private BigDecimal value;
 
