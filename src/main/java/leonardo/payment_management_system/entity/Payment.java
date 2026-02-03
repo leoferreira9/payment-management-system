@@ -32,10 +32,11 @@ public class Payment {
 
     public Payment(){}
 
-    public Payment(BigDecimal value, LocalDateTime paymentDeadline, PaymentStatus status) {
+    public Payment(BigDecimal value, LocalDateTime paymentDeadline, PaymentStatus status, PaymentType paymentType) {
         this.value = value;
         this.paymentDeadline = paymentDeadline;
         this.status = status;
+        this.paymentType = paymentType;
     }
 
     public Long getId() {
@@ -64,5 +65,13 @@ public class Payment {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
     }
 }
