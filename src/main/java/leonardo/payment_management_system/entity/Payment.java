@@ -3,6 +3,7 @@ package leonardo.payment_management_system.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import leonardo.payment_management_system.enums.PaymentStatus;
+import leonardo.payment_management_system.enums.PaymentType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,6 +18,10 @@ public class Payment {
     @DecimalMin("0.0")
     @Column(nullable = false, precision = 9, scale = 2)
     private BigDecimal value;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentType paymentType;
 
     @Column(nullable = false)
     private LocalDateTime paymentDeadline;
