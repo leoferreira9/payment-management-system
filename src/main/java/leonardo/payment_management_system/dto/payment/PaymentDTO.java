@@ -28,6 +28,10 @@ public class PaymentDTO {
         return id;
     }
 
+    public void setId(Long id){
+        this.id = id;
+    }
+
     public BigDecimal getValue() {
         return value;
     }
