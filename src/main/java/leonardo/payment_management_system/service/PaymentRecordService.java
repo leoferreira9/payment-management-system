@@ -1,5 +1,6 @@
 package leonardo.payment_management_system.service;
 
+import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.paymentRecord.CreatePaymentRecordDTO;
 import leonardo.payment_management_system.dto.paymentRecord.PaymentRecordDTO;
 import leonardo.payment_management_system.entity.Payment;
@@ -28,10 +29,6 @@ public class PaymentRecordService {
         this.mapper = mapper;
     }
 
-    public PaymentRecord findPaymentRecordOrThrow(Long id){
-        return paymentRecordRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment record not found with ID: " + id));
-    }
-
     private static final Map<PaymentRecordStatus, PaymentStatus> map = new EnumMap<>(PaymentRecordStatus.class);
 
     static {
@@ -40,6 +37,7 @@ public class PaymentRecordService {
         map.put(PaymentRecordStatus.REFUNDED, PaymentStatus.CANCELLED);
     }
 
+    @Transactional
     public PaymentRecordDTO create(CreatePaymentRecordDTO dto){
         Payment payment = paymentRepository.findById(dto.getPaymentId()).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + dto.getPaymentId()));
         PaymentRecord paymentRecord = mapper.toEntity(dto);
