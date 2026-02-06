@@ -9,7 +9,6 @@ import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,9 +28,8 @@ public class PaymentService {
 
     public PaymentDTO create(CreatePaymentDTO dto){
         Payment payment = mapper.toEntity(dto);
-        payment.setPaymentDeadline(LocalDateTime.now());
         payment.setStatus(PaymentStatus.PENDING);
-
+        payment.setPaymentDeadline(dto.getPaymentType().getDeadLine());
         Payment savedPayment = paymentRepository.save(payment);
         return mapper.toDto(savedPayment);
     }
