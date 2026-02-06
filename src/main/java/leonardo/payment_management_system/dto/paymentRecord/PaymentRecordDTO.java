@@ -1,5 +1,6 @@
 package leonardo.payment_management_system.dto.paymentRecord;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 
@@ -11,9 +12,11 @@ public class PaymentRecordDTO {
     private Long id;
     private Long paymentId;
     private BigDecimal value;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime eventDate;
     private PaymentRecordStatus status;
     private PaymentType paymentType;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime paymentDeadlineSnapshot;
 
     public PaymentRecordDTO() {}
