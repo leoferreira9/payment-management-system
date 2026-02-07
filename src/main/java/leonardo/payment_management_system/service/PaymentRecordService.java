@@ -38,8 +38,8 @@ public class PaymentRecordService {
     }
 
     @Transactional
-    public PaymentRecordDTO create(CreatePaymentRecordDTO dto){
-        Payment payment = paymentRepository.findById(dto.getPaymentId()).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + dto.getPaymentId()));
+    public PaymentRecordDTO create(Long paymentId, CreatePaymentRecordDTO dto){
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + paymentId));
         PaymentRecord paymentRecord = mapper.toEntity(dto);
 
         paymentRecord.setValue(payment.getValue());

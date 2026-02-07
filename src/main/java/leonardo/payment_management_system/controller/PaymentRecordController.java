@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/payments-records")
+@RequestMapping("/payments/{paymentId}/records")
 public class PaymentRecordController {
 
     private final PaymentRecordService paymentRecordService;
@@ -19,11 +19,11 @@ public class PaymentRecordController {
     }
 
     @PostMapping
-    public PaymentRecordDTO create(@RequestBody @Valid CreatePaymentRecordDTO dto){
-        return paymentRecordService.create(dto);
+    public PaymentRecordDTO create(@PathVariable Long paymentId, @RequestBody @Valid CreatePaymentRecordDTO dto){
+        return paymentRecordService.create(paymentId, dto);
     }
 
-    @GetMapping("/{paymentId}")
+    @GetMapping
     public List<PaymentRecordDTO> findAllByPaymentId(@PathVariable Long paymentId){
         return paymentRecordService.findAllByPaymentId(paymentId);
     }
