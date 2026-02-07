@@ -19,18 +19,18 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<PaymentDTO> create(@RequestBody @Valid CreatePaymentDTO dto){
         return ResponseEntity.status(201).body(paymentService.create(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PaymentDTO> findById(@PathVariable Long id){
-        return ResponseEntity.status(200).body(paymentService.findById(id));
+        return ResponseEntity.ok().body(paymentService.findById(id));
     }
 
     @GetMapping
     public ResponseEntity<List<PaymentDTO>> findAll(){
-        return ResponseEntity.status(200).body(paymentService.findAll());
+        return ResponseEntity.ok().body(paymentService.findAll());
     }
 }

@@ -26,6 +26,6 @@ public class PaymentRecordController {
 
     @GetMapping
     public ResponseEntity<List<PaymentRecordDTO>> findAllByPaymentId(@PathVariable Long paymentId){
-        return ResponseEntity.status(200).body(paymentRecordService.findAllByPaymentId(paymentId));
+        return ResponseEntity.ok().body(paymentRecordService.findAllByPaymentId(paymentId));
     }
 }
