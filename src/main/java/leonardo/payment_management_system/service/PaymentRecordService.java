@@ -11,6 +11,8 @@ import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentRecordMapper;
 import leonardo.payment_management_system.repository.PaymentRecordRepository;
 import leonardo.payment_management_system.repository.PaymentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,7 +57,7 @@ public class PaymentRecordService {
         return mapper.toDto(savedPaymentRecord);
     }
 
-    public List<PaymentRecordDTO> findAllByPaymentId(Long id){
-        return paymentRecordRepository.findAllByPaymentId(id).stream().map(mapper::toDto).toList();
+    public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
+        return paymentRecordRepository.findAllByPaymentId(id, pageable).map(mapper::toDto);
     }
 }
