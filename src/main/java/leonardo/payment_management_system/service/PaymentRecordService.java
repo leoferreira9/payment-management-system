@@ -31,6 +31,10 @@ public class PaymentRecordService {
         this.mapper = mapper;
     }
 
+    public Payment findPaymentOrThrow(Long id){
+        return paymentRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + id));
+    }
+
     private static final Map<PaymentRecordStatus, PaymentStatus> map = new EnumMap<>(PaymentRecordStatus.class);
 
     static {
@@ -58,6 +62,7 @@ public class PaymentRecordService {
     }
 
     public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
+        findPaymentOrThrow(id);
         return paymentRecordRepository.findAllByPaymentId(id, pageable).map(mapper::toDto);
     }
 }
