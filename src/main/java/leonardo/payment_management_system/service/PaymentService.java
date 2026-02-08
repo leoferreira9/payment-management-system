@@ -8,7 +8,6 @@ import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +41,7 @@ public class PaymentService {
         return mapper.toDto(payment);
     }
 
-    public Page<PaymentDTO> findAll(int pageNumber, int pageSize){
-
-        if(pageSize > 50) pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    public Page<PaymentDTO> findAll(Pageable pageable){
         return paymentRepository.findAll(pageable).map(mapper::toDto);
     }
 
