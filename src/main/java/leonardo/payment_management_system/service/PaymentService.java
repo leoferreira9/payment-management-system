@@ -7,10 +7,12 @@ import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class PaymentService {
@@ -40,8 +42,11 @@ public class PaymentService {
         return mapper.toDto(payment);
     }
 
-    public List<PaymentDTO> findAll(){
-        return paymentRepository.findAll().stream().map(mapper::toDto).toList();
+    public Page<PaymentDTO> findAll(int pageNumber, int pageSize){
+
+        if(pageSize > 50) pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return paymentRepository.findAll(pageable).map(mapper::toDto);
     }
 
 }

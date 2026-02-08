@@ -4,10 +4,9 @@ import jakarta.validation.Valid;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
 import leonardo.payment_management_system.service.PaymentService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
@@ -30,7 +29,8 @@ public class PaymentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PaymentDTO>> findAll(){
-        return ResponseEntity.ok().body(paymentService.findAll());
+    public ResponseEntity<Page<PaymentDTO>> findAll(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize){
+        Page<PaymentDTO> paymentsPage = paymentService.findAll(pageNumber, pageSize);
+        return ResponseEntity.ok().body(paymentsPage);
     }
 }
