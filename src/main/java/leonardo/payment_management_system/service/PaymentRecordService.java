@@ -8,6 +8,7 @@ import leonardo.payment_management_system.entity.PaymentRecord;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.exception.EntityNotFound;
+import leonardo.payment_management_system.exception.InvalidPaymentStatusTransitionException;
 import leonardo.payment_management_system.mapper.PaymentRecordMapper;
 import leonardo.payment_management_system.repository.PaymentRecordRepository;
 import leonardo.payment_management_system.repository.PaymentRepository;
@@ -35,12 +36,17 @@ public class PaymentRecordService {
         return paymentRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + id));
     }
 
-    private static final Map<PaymentRecordStatus, PaymentStatus> map = new EnumMap<>(PaymentRecordStatus.class);
-
+    private static final Map<PaymentRecordStatus, PaymentStatus> setPaymentStatus = new EnumMap<>(PaymentRecordStatus.class);
     static {
-        map.put(PaymentRecordStatus.PAID, PaymentStatus.PAID);
-        map.put(PaymentRecordStatus.CANCELLED,PaymentStatus.CANCELLED);
-        map.put(PaymentRecordStatus.REFUNDED, PaymentStatus.CANCELLED);
+        setPaymentStatus.put(PaymentRecordStatus.PAID, PaymentStatus.PAID);
+        setPaymentStatus.put(PaymentRecordStatus.CANCELLED,PaymentStatus.CANCELLED);
+        setPaymentStatus.put(PaymentRecordStatus.REFUNDED, PaymentStatus.CANCELLED);
+    }
+
+    private static final Map<PaymentStatus, Set<PaymentRecordStatus>> allowedTransitions = new HashMap<>();
+    static{
+        allowedTransitions.put(PaymentStatus.PENDING, EnumSet.of(PaymentRecordStatus.PAID, PaymentRecordStatus.CANCELLED));
+        allowedTransitions.put(PaymentStatus.PAID, EnumSet.of(PaymentRecordStatus.REFUNDED));
     }
 
     @Transactional
@@ -54,8 +60,14 @@ public class PaymentRecordService {
         paymentRecord.setPaymentDeadlineSnapshot(payment.getPaymentDeadline());
         paymentRecord.setEventDate(LocalDateTime.now());
 
+        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
+        if(allowedStatus != null && allowedStatus.contains(paymentRecord.getStatus())){
+            payment.setStatus(setPaymentStatus.get(dto.getStatus()));
+        } else {
+            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + paymentRecord.getStatus());
+        }
+
         PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
-        payment.setStatus(map.get(dto.getStatus()));
         paymentRepository.save(payment);
 
         return mapper.toDto(savedPaymentRecord);
