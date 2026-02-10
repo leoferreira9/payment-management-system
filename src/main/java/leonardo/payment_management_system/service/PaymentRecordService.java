@@ -54,18 +54,20 @@ public class PaymentRecordService {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + paymentId));
         PaymentRecord paymentRecord = mapper.toEntity(dto);
 
+        if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment cancelled.");
+
+        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
+        if(allowedStatus != null && allowedStatus.contains(dto.getStatus())){
+            payment.setStatus(setPaymentStatus.get(dto.getStatus()));
+        } else {
+            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + dto.getStatus());
+        }
+
         paymentRecord.setValue(payment.getValue());
         paymentRecord.setPayment(payment);
         paymentRecord.setPaymentType(payment.getPaymentType());
         paymentRecord.setPaymentDeadlineSnapshot(payment.getPaymentDeadline());
         paymentRecord.setEventDate(LocalDateTime.now());
-
-        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
-        if(allowedStatus != null && allowedStatus.contains(paymentRecord.getStatus())){
-            payment.setStatus(setPaymentStatus.get(dto.getStatus()));
-        } else {
-            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + paymentRecord.getStatus());
-        }
 
         PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
         paymentRepository.save(payment);
