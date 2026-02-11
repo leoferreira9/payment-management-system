@@ -1,9 +1,7 @@
 package leonardo.payment_management_system.service;
 
-import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
-import leonardo.payment_management_system.dto.paymentRecord.PaymentRecordDTO;
 import leonardo.payment_management_system.entity.Payment;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentStatus;
@@ -51,12 +49,12 @@ public class PaymentService {
     }
 
     public PaymentDTO confirmPayment(Long id){
-        PaymentRecordDTO paymentRecord = paymentRecordService.create(id, PaymentRecordStatus.PAID);
-        return mapper.toDto(findPaymentOrThrow(paymentRecord.getPaymentId()));
+        Payment payment = paymentRecordService.create(id, PaymentRecordStatus.PAID);
+        return mapper.toDto(payment);
     }
 
     public PaymentDTO cancelPayment(Long id){
-        PaymentRecordDTO paymentRecordDTO = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
-        return mapper.toDto(findPaymentOrThrow(paymentRecordDTO.getPaymentId()));
+        Payment payment = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
+        return mapper.toDto(payment);
     }
 }

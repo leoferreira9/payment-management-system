@@ -3,7 +3,6 @@ package leonardo.payment_management_system.controller;
 import jakarta.validation.Valid;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
-import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.service.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

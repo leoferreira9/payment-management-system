@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -78,7 +77,7 @@ public class PaymentRecordService {
     }
 
     @Transactional
-    public PaymentRecordDTO create (Long paymentId, PaymentRecordStatus status){
+    public Payment create (Long paymentId, PaymentRecordStatus status){
         Payment payment = findPaymentOrThrow(paymentId);
 
         if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment cancelled.");
@@ -99,10 +98,10 @@ public class PaymentRecordService {
                 payment.getPaymentDeadline()
         );
 
-        PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
+        paymentRecordRepository.save(paymentRecord);
         paymentRepository.save(payment);
 
-        return mapper.toDto(savedPaymentRecord);
+        return payment;
     }
 
     public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
