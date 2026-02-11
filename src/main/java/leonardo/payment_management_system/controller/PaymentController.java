@@ -1,5 +1,10 @@
 package leonardo.payment_management_system.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
@@ -10,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Payments", description = "Operations related to payments")
 @RestController
 @RequestMapping("/payments")
 public class PaymentController {
@@ -20,18 +26,37 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+    @Operation(summary = "Add new Payment", description = "Creates a new payment")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "payment successfully created"),
+            @ApiResponse(responseCode = "400", description = "failed to create payment")
+    })
     @PostMapping
     public ResponseEntity<PaymentDTO> create(@RequestBody @Valid CreatePaymentDTO dto){
         return ResponseEntity.status(201).body(paymentService.create(dto));
     }
 
+    @Operation(summary = "Find payment", description = "Return a payment by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "payment successfully found"),
+            @ApiResponse(responseCode = "404", description = "payment not found")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentDTO> findById(@PathVariable Long id){
+    public ResponseEntity<PaymentDTO> findById(
+            @Parameter(description = "Payment ID to be found", example = "1", required = true)
+            @PathVariable Long id){
         return ResponseEntity.ok().body(paymentService.findById(id));
     }
 
+    @Operation(summary = "Find payments", description = "Find all payments")
+    @ApiResponse(responseCode = "200", description = "found all payments successfully")
     @GetMapping
-    public ResponseEntity<Page<PaymentDTO>> findAll(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize){
+    public ResponseEntity<Page<PaymentDTO>> findAll(
+            @Parameter(description = "Page number", example = "0")
+            @RequestParam(defaultValue = "0") int pageNumber,
+
+            @Parameter(description = "page size", example = "10")
+            @RequestParam(defaultValue = "10") int pageSize){
         if(pageSize > 50) pageSize = 10;
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -39,13 +64,27 @@ public class PaymentController {
         return ResponseEntity.ok().body(paymentsPage);
     }
 
+    @Operation(summary = "Confirm payment", description = "Confirms a pending payment and marks it as PAID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "payment successfully confirmed"),
+            @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
+    })
     @PostMapping("/{paymentId}/confirm")
-    public ResponseEntity<PaymentDTO> confirm(@PathVariable Long paymentId){
+    public ResponseEntity<PaymentDTO> confirm(
+            @Parameter(description = "payment id", example = "1", required = true)
+            @PathVariable Long paymentId){
         return ResponseEntity.ok().body(paymentService.confirmPayment(paymentId));
     }
 
+    @Operation(summary = "Cancel payment", description = "Cancels a pending payment and marks it as CANCELLED")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "payment successfully cancelled"),
+            @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
+    })
     @PostMapping("/{paymentId}/cancel")
-    public ResponseEntity<PaymentDTO> cancel(@PathVariable Long paymentId){
+    public ResponseEntity<PaymentDTO> cancel(
+            @Parameter(description = "payment id", example = "1", required = true)
+            @PathVariable Long paymentId){
         return ResponseEntity.ok().body(paymentService.cancelPayment(paymentId));
     }
 }
