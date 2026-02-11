@@ -56,7 +56,7 @@ public class PaymentService {
     }
 
     public PaymentDTO cancelPayment(Long id){
-        PaymentRecordDTO paymentRecordDTO = paymentRecordService.cancel(id, PaymentRecordStatus.CANCELLED);
+        PaymentRecordDTO paymentRecordDTO = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
         return mapper.toDto(findPaymentOrThrow(paymentRecordDTO.getPaymentId()));
     }
 }

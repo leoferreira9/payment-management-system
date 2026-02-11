@@ -105,33 +105,6 @@ public class PaymentRecordService {
         return mapper.toDto(savedPaymentRecord);
     }
 
-    public PaymentRecordDTO cancel(Long id, PaymentRecordStatus status){
-        Payment payment = findPaymentOrThrow(id);
-
-        if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment already cancelled.");
-
-        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
-        if(allowedStatus != null && allowedStatus.contains(status)){
-            payment.setStatus(setPaymentStatus.get(status));
-        } else {
-            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + status);
-        }
-
-        PaymentRecord paymentRecord = new PaymentRecord(
-                payment,
-                payment.getValue(),
-                LocalDateTime.now(),
-                status,
-                payment.getPaymentType(),
-                payment.getPaymentDeadline()
-        );
-
-        PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
-        paymentRepository.save(payment);
-
-        return mapper.toDto(savedPaymentRecord);
-    }
-
     public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
         findPaymentOrThrow(id);
         return paymentRecordRepository.findAllByPaymentId(id, pageable).map(mapper::toDto);
