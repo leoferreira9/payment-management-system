@@ -1,8 +1,11 @@
 package leonardo.payment_management_system.service;
 
+import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.dto.paymentRecord.PaymentRecordDTO;
 import leonardo.payment_management_system.entity.Payment;
+import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentMapper;
@@ -18,10 +21,12 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper mapper;
+    PaymentRecordService paymentRecordService;
 
-    public PaymentService(PaymentRepository paymentRepository, PaymentMapper mapper){
+    public PaymentService(PaymentRepository paymentRepository, PaymentMapper mapper, PaymentRecordService paymentRecordService){
         this.paymentRepository = paymentRepository;
         this.mapper = mapper;
+        this.paymentRecordService = paymentRecordService;
     }
 
     public Payment findPaymentOrThrow(Long id){
@@ -45,4 +50,13 @@ public class PaymentService {
         return paymentRepository.findAll(pageable).map(mapper::toDto);
     }
 
+    public PaymentDTO confirmPayment(Long id){
+        PaymentRecordDTO paymentRecord = paymentRecordService.create(id, PaymentRecordStatus.PAID);
+        return mapper.toDto(findPaymentOrThrow(paymentRecord.getPaymentId()));
+    }
+
+    public PaymentDTO cancelPayment(Long id){
+        PaymentRecordDTO paymentRecordDTO = paymentRecordService.cancel(id, PaymentRecordStatus.CANCELLED);
+        return mapper.toDto(findPaymentOrThrow(paymentRecordDTO.getPaymentId()));
+    }
 }

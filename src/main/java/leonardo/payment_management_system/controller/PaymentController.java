@@ -3,6 +3,7 @@ package leonardo.payment_management_system.controller;
 import jakarta.validation.Valid;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.service.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,5 +38,15 @@ public class PaymentController {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PaymentDTO> paymentsPage = paymentService.findAll(pageable);
         return ResponseEntity.ok().body(paymentsPage);
+    }
+
+    @PostMapping("/{paymentId}/confirm")
+    public ResponseEntity<PaymentDTO> confirm(@PathVariable Long paymentId){
+        return ResponseEntity.ok().body(paymentService.confirmPayment(paymentId));
+    }
+
+    @PostMapping("/{paymentId}/cancel")
+    public ResponseEntity<PaymentDTO> cancel(@PathVariable Long paymentId){
+        return ResponseEntity.ok().body(paymentService.cancelPayment(paymentId));
     }
 }

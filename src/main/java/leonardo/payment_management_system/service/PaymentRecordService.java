@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -51,10 +52,11 @@ public class PaymentRecordService {
 
     @Transactional
     public PaymentRecordDTO create(Long paymentId, CreatePaymentRecordDTO dto){
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + paymentId));
-        PaymentRecord paymentRecord = mapper.toEntity(dto);
+        Payment payment = findPaymentOrThrow(paymentId);
 
         if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment cancelled.");
+
+        PaymentRecord paymentRecord = mapper.toEntity(dto);
 
         Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
         if(allowedStatus != null && allowedStatus.contains(dto.getStatus())){
@@ -68,6 +70,61 @@ public class PaymentRecordService {
         paymentRecord.setPaymentType(payment.getPaymentType());
         paymentRecord.setPaymentDeadlineSnapshot(payment.getPaymentDeadline());
         paymentRecord.setEventDate(LocalDateTime.now());
+
+        PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
+        paymentRepository.save(payment);
+
+        return mapper.toDto(savedPaymentRecord);
+    }
+
+    @Transactional
+    public PaymentRecordDTO create (Long paymentId, PaymentRecordStatus status){
+        Payment payment = findPaymentOrThrow(paymentId);
+
+        if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment cancelled.");
+
+        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
+        if(allowedStatus != null && allowedStatus.contains(status)){
+            payment.setStatus(setPaymentStatus.get(status));
+        } else {
+            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + status);
+        }
+
+        PaymentRecord paymentRecord = new PaymentRecord(
+                payment,
+                payment.getValue(),
+                LocalDateTime.now(),
+                status,
+                payment.getPaymentType(),
+                payment.getPaymentDeadline()
+        );
+
+        PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
+        paymentRepository.save(payment);
+
+        return mapper.toDto(savedPaymentRecord);
+    }
+
+    public PaymentRecordDTO cancel(Long id, PaymentRecordStatus status){
+        Payment payment = findPaymentOrThrow(id);
+
+        if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment already cancelled.");
+
+        Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
+        if(allowedStatus != null && allowedStatus.contains(status)){
+            payment.setStatus(setPaymentStatus.get(status));
+        } else {
+            throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + status);
+        }
+
+        PaymentRecord paymentRecord = new PaymentRecord(
+                payment,
+                payment.getValue(),
+                LocalDateTime.now(),
+                status,
+                payment.getPaymentType(),
+                payment.getPaymentDeadline()
+        );
 
         PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
         paymentRepository.save(payment);
