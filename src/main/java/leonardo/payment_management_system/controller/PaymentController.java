@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @Tag(name = "Payments", description = "Operations related to payments")
 @RestController
 @RequestMapping("/payments")
@@ -33,7 +35,9 @@ public class PaymentController {
     })
     @PostMapping
     public ResponseEntity<PaymentDTO> create(@RequestBody @Valid CreatePaymentDTO dto){
-        return ResponseEntity.status(201).body(paymentService.create(dto));
+        PaymentDTO paymentDTO = paymentService.create(dto);
+        URI location = URI.create("/payments/" + paymentDTO.getId());
+        return ResponseEntity.created(location).body(paymentService.create(dto));
     }
 
     @Operation(summary = "Find payment", description = "Return a payment by its ID")
