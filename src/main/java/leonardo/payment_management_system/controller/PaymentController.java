@@ -10,7 +10,6 @@ import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
 import leonardo.payment_management_system.service.PaymentService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,15 +54,7 @@ public class PaymentController {
     @Operation(summary = "Find payments", description = "Find all payments")
     @ApiResponse(responseCode = "200", description = "found all payments successfully")
     @GetMapping
-    public ResponseEntity<Page<PaymentDTO>> findAll(
-            @Parameter(description = "Page number", example = "0")
-            @RequestParam(defaultValue = "0") int pageNumber,
-
-            @Parameter(description = "page size", example = "10")
-            @RequestParam(defaultValue = "10") int pageSize){
-        if(pageSize > 50) pageSize = 10;
-
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    public ResponseEntity<Page<PaymentDTO>> findAll(Pageable pageable){
         Page<PaymentDTO> paymentsPage = paymentService.findAll(pageable);
         return ResponseEntity.ok().body(paymentsPage);
     }

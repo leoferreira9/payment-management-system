@@ -10,7 +10,6 @@ import leonardo.payment_management_system.dto.paymentRecord.CreatePaymentRecordD
 import leonardo.payment_management_system.dto.paymentRecord.PaymentRecordDTO;
 import leonardo.payment_management_system.service.PaymentRecordService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,18 +45,11 @@ public class PaymentRecordController {
     @ApiResponse(responseCode = "200", description = "found all payment records successfully")
     @GetMapping
     public ResponseEntity<Page<PaymentRecordDTO>> findAllByPaymentId(
+            Pageable pageable,
+
             @Parameter(description = "payment ID", example = "1", required = true)
-            @PathVariable Long paymentId,
-
-            @Parameter(description = "page number", example = "0")
-            @RequestParam(defaultValue = "0") int pageNumber,
-
-            @Parameter(description = "page size", example = "10")
-            @RequestParam(defaultValue = "10") int pageSize
+            @PathVariable Long paymentId
     ){
-
-        if(pageSize > 50) pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return ResponseEntity.ok().body(paymentRecordService.findAllByPaymentId(paymentId, pageable));
     }
 }
