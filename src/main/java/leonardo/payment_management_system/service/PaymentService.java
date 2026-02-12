@@ -5,6 +5,7 @@ import leonardo.payment_management_system.dto.payment.PaymentDTO;
 import leonardo.payment_management_system.entity.Payment;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentStatus;
+import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
@@ -44,8 +45,20 @@ public class PaymentService {
         return mapper.toDto(payment);
     }
 
-    public Page<PaymentDTO> findAll(Pageable pageable){
-        return paymentRepository.findAll(pageable).map(mapper::toDto);
+    public Page<PaymentDTO> findAll(PaymentStatus status, PaymentType type, Pageable pageable){
+        Page<Payment> payment;
+        
+        if(status != null && type != null){
+            payment = paymentRepository.findByStatusAndPaymentType(status, type, pageable);
+        } else if (status != null){
+            payment = paymentRepository.findByStatus(status, pageable);
+        } else if (type != null){
+            payment = paymentRepository.findByPaymentType(type, pageable);
+        } else {
+            payment = paymentRepository.findAll(pageable);
+        }
+
+        return payment.map(mapper::toDto);
     }
 
     public PaymentDTO confirmPayment(Long id){

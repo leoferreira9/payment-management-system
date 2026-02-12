@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.enums.PaymentStatus;
+import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.service.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,8 +56,11 @@ public class PaymentController {
     @Operation(summary = "Find payments", description = "Find all payments")
     @ApiResponse(responseCode = "200", description = "found all payments successfully")
     @GetMapping
-    public ResponseEntity<Page<PaymentDTO>> findAll(Pageable pageable){
-        Page<PaymentDTO> paymentsPage = paymentService.findAll(pageable);
+    public ResponseEntity<Page<PaymentDTO>> findAll(
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(required = false) PaymentType paymentType,
+            Pageable pageable){
+        Page<PaymentDTO> paymentsPage = paymentService.findAll(status, paymentType, pageable);
         return ResponseEntity.ok().body(paymentsPage);
     }
 
