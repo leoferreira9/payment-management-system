@@ -36,6 +36,16 @@ public class PaymentRecordService {
         return paymentRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + id));
     }
 
+    public PaymentRecord buildPaymentRecord(Payment payment, PaymentRecordStatus status){
+        return new PaymentRecord(payment,
+                payment.getValue(),
+                LocalDateTime.now(),
+                status,
+                payment.getPaymentType(),
+                payment.getPaymentDeadline()
+        );
+    }
+
     private static final Map<PaymentRecordStatus, PaymentStatus> setPaymentStatus = new EnumMap<>(PaymentRecordStatus.class);
     static {
         setPaymentStatus.put(PaymentRecordStatus.PAID, PaymentStatus.PAID);
@@ -89,14 +99,7 @@ public class PaymentRecordService {
             throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + status);
         }
 
-        PaymentRecord paymentRecord = new PaymentRecord(
-                payment,
-                payment.getValue(),
-                LocalDateTime.now(),
-                status,
-                payment.getPaymentType(),
-                payment.getPaymentDeadline()
-        );
+        PaymentRecord paymentRecord = buildPaymentRecord(payment, status);
 
         paymentRecordRepository.save(paymentRecord);
         paymentRepository.save(payment);
@@ -107,5 +110,11 @@ public class PaymentRecordService {
     public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
         findPaymentOrThrow(id);
         return paymentRecordRepository.findAllByPaymentId(id, pageable).map(mapper::toDto);
+    }
+
+    public PaymentRecordDTO createInitialRecord (Payment payment){
+        PaymentRecord paymentRecord = buildPaymentRecord(payment, PaymentRecordStatus.PENDING);
+        PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
+        return mapper.toDto(savedPaymentRecord);
     }
 }

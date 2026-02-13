@@ -1,5 +1,6 @@
 package leonardo.payment_management_system.service;
 
+import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
 import leonardo.payment_management_system.entity.Payment;
@@ -32,14 +33,16 @@ public class PaymentService {
         return paymentRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + id));
     }
 
+    @Transactional
     public PaymentDTO create(CreatePaymentDTO dto){
         Payment payment = mapper.toEntity(dto);
         payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentDeadline(dto.getPaymentType().calculateDeadline(LocalDateTime.now()));
         Payment savedPayment = paymentRepository.save(payment);
+        paymentRecordService.createInitialRecord(savedPayment);
         return mapper.toDto(savedPayment);
-    }
 
+    }
     public PaymentDTO findById(Long id){
         Payment payment = findPaymentOrThrow(id);
         return mapper.toDto(payment);
