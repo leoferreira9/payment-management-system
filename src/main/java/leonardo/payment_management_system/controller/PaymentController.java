@@ -38,7 +38,7 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> create(@RequestBody @Valid CreatePaymentDTO dto){
         PaymentDTO paymentDTO = paymentService.create(dto);
         URI location = URI.create("/payments/" + paymentDTO.getId());
-        return ResponseEntity.created(location).body(paymentService.create(dto));
+        return ResponseEntity.created(location).body(paymentDTO);
     }
 
     @Operation(summary = "Find payment", description = "Return a payment by its ID")
