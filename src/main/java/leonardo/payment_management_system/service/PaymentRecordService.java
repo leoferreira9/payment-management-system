@@ -12,7 +12,9 @@ import leonardo.payment_management_system.exception.InvalidPaymentStatusTransiti
 import leonardo.payment_management_system.mapper.PaymentRecordMapper;
 import leonardo.payment_management_system.repository.PaymentRecordRepository;
 import leonardo.payment_management_system.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,9 @@ public class PaymentRecordService {
     private final PaymentRecordRepository paymentRecordRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentRecordMapper mapper;
+
+    @Value("${app.pagination.max-page-size}")
+    private int maxPageSize;
 
     public PaymentRecordService(PaymentRecordRepository paymentRecordRepository, PaymentRecordMapper mapper, PaymentRepository paymentRepository){
         this.paymentRecordRepository = paymentRecordRepository;
@@ -109,7 +114,15 @@ public class PaymentRecordService {
 
     public Page<PaymentRecordDTO> findAllByPaymentId(Long id, Pageable pageable){
         findPaymentOrThrow(id);
-        return paymentRecordRepository.findAllByPaymentId(id, pageable).map(mapper::toDto);
+
+        int size = Math.min(pageable.getPageSize(), maxPageSize);
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                size,
+                pageable.getSort()
+        );
+
+        return paymentRecordRepository.findAllByPaymentId(id, newPageable).map(mapper::toDto);
     }
 
     public PaymentRecordDTO createInitialRecord (Payment payment){

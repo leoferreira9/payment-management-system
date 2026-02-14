@@ -10,7 +10,9 @@ import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper mapper;
     PaymentRecordService paymentRecordService;
+
+    @Value("${app.pagination.max-page-size}")
+    private int maxPageSize;
 
     public PaymentService(PaymentRepository paymentRepository, PaymentMapper mapper, PaymentRecordService paymentRecordService){
         this.paymentRepository = paymentRepository;
@@ -49,16 +54,23 @@ public class PaymentService {
     }
 
     public Page<PaymentDTO> findAll(PaymentStatus status, PaymentType type, Pageable pageable){
+
+        int size = Math.min(pageable.getPageSize(), maxPageSize);
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                size,
+                pageable.getSort()
+        );
+
         Page<Payment> payment;
-        
         if(status != null && type != null){
-            payment = paymentRepository.findByStatusAndPaymentType(status, type, pageable);
+            payment = paymentRepository.findByStatusAndPaymentType(status, type, newPageable);
         } else if (status != null){
-            payment = paymentRepository.findByStatus(status, pageable);
+            payment = paymentRepository.findByStatus(status, newPageable);
         } else if (type != null){
-            payment = paymentRepository.findByPaymentType(type, pageable);
+            payment = paymentRepository.findByPaymentType(type, newPageable);
         } else {
-            payment = paymentRepository.findAll(pageable);
+            payment = paymentRepository.findAll(newPageable);
         }
 
         return payment.map(mapper::toDto);
