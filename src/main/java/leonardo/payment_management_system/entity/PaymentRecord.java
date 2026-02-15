@@ -35,15 +35,19 @@ public class PaymentRecord {
     @Column(nullable = false)
     private LocalDateTime paymentDeadlineSnapshot;
 
+    @Column(length = 100)
+    private String description;
+
     public PaymentRecord(){}
 
-    public PaymentRecord(Payment payment, BigDecimal value, LocalDateTime eventDate, PaymentRecordStatus status, PaymentType paymentType, LocalDateTime paymentDeadlineSnapshot) {
+    public PaymentRecord(Payment payment, BigDecimal value, LocalDateTime eventDate, PaymentRecordStatus status, PaymentType paymentType, LocalDateTime paymentDeadlineSnapshot, String description) {
         this.payment = payment;
         this.value = value;
         this.eventDate = eventDate;
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDeadlineSnapshot = paymentDeadlineSnapshot;
+        this.description = description;
     }
 
     public Long getId() {
@@ -96,5 +100,13 @@ public class PaymentRecord {
 
     public void setPaymentDeadlineSnapshot(LocalDateTime paymentDeadlineSnapshot) {
         this.paymentDeadlineSnapshot = paymentDeadlineSnapshot;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

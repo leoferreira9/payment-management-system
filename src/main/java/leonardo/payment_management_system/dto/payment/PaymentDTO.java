@@ -15,15 +15,17 @@ public class PaymentDTO {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime paymentDeadline;
     private PaymentStatus status;
+    private String description;
 
     public PaymentDTO(){}
 
-    public PaymentDTO(Long id, BigDecimal value, PaymentType paymentType, LocalDateTime paymentDeadline, PaymentStatus status) {
+    public PaymentDTO(Long id, BigDecimal value, PaymentType paymentType, LocalDateTime paymentDeadline, PaymentStatus status, String description) {
         this.id = id;
         this.value = value;
         this.paymentType = paymentType;
         this.paymentDeadline = paymentDeadline;
         this.status = status;
+        this.description = description;
     }
 
     public Long getId() {
@@ -64,5 +66,13 @@ public class PaymentDTO {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

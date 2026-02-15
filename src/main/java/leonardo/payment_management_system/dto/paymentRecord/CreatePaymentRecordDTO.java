@@ -8,9 +8,15 @@ public class CreatePaymentRecordDTO {
     @NotNull
     private PaymentRecordStatus status;
 
+    private String description;
+
     public CreatePaymentRecordDTO(){}
 
     public PaymentRecordStatus getStatus() {
         return status;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

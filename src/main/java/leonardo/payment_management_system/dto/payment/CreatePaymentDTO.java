@@ -2,6 +2,7 @@ package leonardo.payment_management_system.dto.payment;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import leonardo.payment_management_system.enums.PaymentType;
 
 import java.math.BigDecimal;
@@ -15,6 +16,9 @@ public class CreatePaymentDTO {
     @NotNull
     private PaymentType paymentType;
 
+    @Size(max = 100)
+    private String description;
+
     public CreatePaymentDTO(){}
 
     public BigDecimal getValue() {
@@ -25,4 +29,7 @@ public class CreatePaymentDTO {
         return paymentType;
     }
 
+    public String getDescription() {
+        return description;
+    }
 }

@@ -18,10 +18,11 @@ public class PaymentRecordDTO {
     private PaymentType paymentType;
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime paymentDeadlineSnapshot;
+    private String description;
 
     public PaymentRecordDTO() {}
 
-    public PaymentRecordDTO(Long id, Long paymentId, BigDecimal value, LocalDateTime eventDate, PaymentRecordStatus status, PaymentType paymentType, LocalDateTime paymentDeadlineSnapshot) {
+    public PaymentRecordDTO(Long id, Long paymentId, BigDecimal value, LocalDateTime eventDate, PaymentRecordStatus status, PaymentType paymentType, LocalDateTime paymentDeadlineSnapshot, String description) {
         this.id = id;
         this.paymentId = paymentId;
         this.value = value;
@@ -29,6 +30,7 @@ public class PaymentRecordDTO {
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDeadlineSnapshot = paymentDeadlineSnapshot;
+        this.description = description;
     }
 
     public Long getId() {
@@ -85,5 +87,13 @@ public class PaymentRecordDTO {
 
     public void setPaymentDeadlineSnapshot(LocalDateTime paymentDeadlineSnapshot) {
         this.paymentDeadlineSnapshot = paymentDeadlineSnapshot;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

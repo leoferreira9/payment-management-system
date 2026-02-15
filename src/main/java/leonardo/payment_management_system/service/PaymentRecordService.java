@@ -45,7 +45,8 @@ public class PaymentRecordService {
                 LocalDateTime.now(),
                 status,
                 payment.getPaymentType(),
-                payment.getPaymentDeadline()
+                payment.getPaymentDeadline(),
+                payment.getDescription()
         );
     }
 
@@ -68,8 +69,6 @@ public class PaymentRecordService {
 
         if(payment.getStatus().equals(PaymentStatus.CANCELLED)) throw new InvalidPaymentStatusTransitionException("Cannot update payment status, payment cancelled.");
 
-        PaymentRecord paymentRecord = mapper.toEntity(dto);
-
         Set<PaymentRecordStatus> allowedStatus = allowedTransitions.get(payment.getStatus());
         if(allowedStatus != null && allowedStatus.contains(dto.getStatus())){
             payment.setStatus(setPaymentStatus.get(dto.getStatus()));
@@ -77,11 +76,7 @@ public class PaymentRecordService {
             throw new InvalidPaymentStatusTransitionException("Cannot update payment from " + payment.getStatus() + " to " + dto.getStatus());
         }
 
-        paymentRecord.setValue(payment.getValue());
-        paymentRecord.setPayment(payment);
-        paymentRecord.setPaymentType(payment.getPaymentType());
-        paymentRecord.setPaymentDeadlineSnapshot(payment.getPaymentDeadline());
-        paymentRecord.setEventDate(LocalDateTime.now());
+        PaymentRecord paymentRecord = buildPaymentRecord(payment, dto.getStatus());
 
         PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
         paymentRepository.save(payment);

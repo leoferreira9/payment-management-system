@@ -2,6 +2,7 @@ package leonardo.payment_management_system.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Size;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 
@@ -30,13 +31,18 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    @Size(max = 100)
+    @Column(length = 100)
+    private String description;
+
     public Payment(){}
 
-    public Payment(BigDecimal value, LocalDateTime paymentDeadline, PaymentStatus status, PaymentType paymentType) {
+    public Payment(BigDecimal value, LocalDateTime paymentDeadline, PaymentStatus status, PaymentType paymentType, String description) {
         this.value = value;
         this.paymentDeadline = paymentDeadline;
         this.status = status;
         this.paymentType = paymentType;
+        this.description = description;
     }
 
     public Long getId() {
@@ -73,5 +79,13 @@ public class Payment {
 
     public void setPaymentType(PaymentType paymentType) {
         this.paymentType = paymentType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
