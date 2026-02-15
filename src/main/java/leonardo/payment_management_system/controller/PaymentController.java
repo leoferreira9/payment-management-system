@@ -6,12 +6,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import leonardo.payment_management_system.common.pagination.PageResponse;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.service.PaymentService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,11 +56,11 @@ public class PaymentController {
     @Operation(summary = "Find payments", description = "Find all payments")
     @ApiResponse(responseCode = "200", description = "found all payments successfully")
     @GetMapping
-    public ResponseEntity<Page<PaymentDTO>> findAll(
+    public ResponseEntity<PageResponse<PaymentDTO>> findAll(
             @RequestParam(required = false) PaymentStatus status,
             @RequestParam(required = false) PaymentType paymentType,
             Pageable pageable){
-        Page<PaymentDTO> paymentsPage = paymentService.findAll(status, paymentType, pageable);
+        PageResponse<PaymentDTO> paymentsPage = PageResponse.from(paymentService.findAll(status, paymentType, pageable));
         return ResponseEntity.ok().body(paymentsPage);
     }
 
