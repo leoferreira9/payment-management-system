@@ -72,7 +72,8 @@ public class PaymentController {
     @PostMapping("/{paymentId}/confirm")
     public ResponseEntity<PaymentDTO> confirm(
             @Parameter(description = "payment id", example = "1", required = true)
-            @PathVariable Long paymentId){
+            @PathVariable Long paymentId
+    ){
         return ResponseEntity.ok().body(paymentService.confirmPayment(paymentId));
     }
 
@@ -84,7 +85,21 @@ public class PaymentController {
     @PostMapping("/{paymentId}/cancel")
     public ResponseEntity<PaymentDTO> cancel(
             @Parameter(description = "payment id", example = "1", required = true)
-            @PathVariable Long paymentId){
+            @PathVariable Long paymentId
+    ){
         return ResponseEntity.ok().body(paymentService.cancelPayment(paymentId));
+    }
+
+    @Operation(summary = "Refund payment", description = "Refunds a paid payment and marks it as REFUNDED")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "payment successfully refunded"),
+            @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
+    })
+    @PostMapping("/{paymentId}/refund")
+    public ResponseEntity<PaymentDTO> refund(
+            @Parameter(description = "payment id", example = "1", required = true)
+            @PathVariable Long paymentId
+    ){
+        return ResponseEntity.ok().body(paymentService.refundPayment(paymentId));
     }
 }

@@ -78,4 +78,9 @@ public class PaymentService {
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
         return mapper.toDto(payment);
     }
+
+    public PaymentDTO refundPayment(Long id){
+        Payment payment = paymentRecordService.create(id, PaymentRecordStatus.REFUNDED);
+        return mapper.toDto(payment);
+    }
 }
