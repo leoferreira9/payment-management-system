@@ -3,11 +3,8 @@ package leonardo.payment_management_system.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import leonardo.payment_management_system.common.pagination.PageResponse;
-import leonardo.payment_management_system.dto.paymentRecord.CreatePaymentRecordDTO;
 import leonardo.payment_management_system.dto.paymentRecord.PaymentRecordDTO;
 import leonardo.payment_management_system.service.PaymentRecordService;
 import org.springframework.data.domain.Pageable;
@@ -24,22 +21,6 @@ public class PaymentRecordController {
     public PaymentRecordController (PaymentRecordService paymentRecordService){
         this.paymentRecordService = paymentRecordService;
     }
-
-    @Operation(summary = "Add new Payment record", description = "Creates a new record for the payment")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "payment record successfully created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "404", description = "Payment not found"),
-            @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
-    })
-    @PostMapping
-    public ResponseEntity<PaymentRecordDTO> create(
-            @Parameter(description = "payment id", example = "1", required = true)
-            @PathVariable Long paymentId,
-            @RequestBody @Valid CreatePaymentRecordDTO dto){
-        return ResponseEntity.status(201).body(paymentRecordService.create(paymentId, dto));
-    }
-
 
     @Operation(summary = "Find all payment records", description = "Find all payment records by payment ID")
     @ApiResponse(responseCode = "200", description = "found all payment records successfully")
