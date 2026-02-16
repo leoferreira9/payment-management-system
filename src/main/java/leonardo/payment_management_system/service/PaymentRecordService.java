@@ -89,7 +89,7 @@ public class PaymentRecordService {
         return paymentRecordRepository.findAllByPaymentId(id, fixedPageable).map(mapper::toDto);
     }
 
-    public PaymentRecordDTO createInitialRecord (Payment payment){
+    public PaymentRecordDTO createRecord (Payment payment){
         PaymentRecord paymentRecord = buildPaymentRecord(payment, PaymentRecordStatus.PENDING);
         PaymentRecord savedPaymentRecord = paymentRecordRepository.save(paymentRecord);
         return mapper.toDto(savedPaymentRecord);

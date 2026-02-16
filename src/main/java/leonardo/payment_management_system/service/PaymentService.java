@@ -3,17 +3,20 @@ package leonardo.payment_management_system.service;
 import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.dto.payment.UpdatePaymentDTO;
 import leonardo.payment_management_system.entity.Payment;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.exception.EntityNotFound;
+import leonardo.payment_management_system.exception.FailedToUpdateEntity;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -42,7 +45,7 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.PENDING);
         payment.setPaymentDeadline(dto.getPaymentType().calculateDeadline(LocalDateTime.now()));
         Payment savedPayment = paymentRepository.save(payment);
-        paymentRecordService.createInitialRecord(savedPayment);
+        paymentRecordService.createRecord(savedPayment);
         return mapper.toDto(savedPayment);
 
     }
@@ -82,5 +85,20 @@ public class PaymentService {
     public PaymentDTO refundPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.REFUNDED);
         return mapper.toDto(payment);
+    }
+
+    public PaymentDTO updatePayment(Long id, UpdatePaymentDTO dto){
+        Payment payment = findPaymentOrThrow(id);
+
+        if(!payment.getStatus().equals(PaymentStatus.PENDING)) throw new FailedToUpdateEntity("Cannot update, payment already paid or cancelled.");
+
+        String description = dto.getDescription() != null ? dto.getDescription() : payment.getDescription();
+        BigDecimal value = dto.getValue() != null ? dto.getValue() : payment.getValue();
+
+        payment.setDescription(description);
+        payment.setValue(value);
+        Payment savedPayment = paymentRepository.save(payment);
+        paymentRecordService.createRecord(payment);
+        return mapper.toDto(savedPayment);
     }
 }

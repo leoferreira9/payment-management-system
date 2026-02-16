@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import leonardo.payment_management_system.common.pagination.PageResponse;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.dto.payment.UpdatePaymentDTO;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.enums.PaymentType;
 import leonardo.payment_management_system.service.PaymentService;
@@ -101,5 +102,18 @@ public class PaymentController {
             @PathVariable Long paymentId
     ){
         return ResponseEntity.ok().body(paymentService.refundPayment(paymentId));
+    }
+
+    @Operation(summary = "Update payment", description = "Update a payment (value or description) by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "payment successfully updated"),
+            @ApiResponse(responseCode = "409", description = "Invalid payment update data")
+    })
+    @PatchMapping("/{paymentId}/update")
+    public ResponseEntity<PaymentDTO> update(
+            @Parameter(description = "payment id", example = "1", required = true)
+            @PathVariable Long paymentId,
+            @RequestBody @Valid UpdatePaymentDTO dto){
+        return ResponseEntity.ok().body(paymentService.updatePayment(paymentId, dto));
     }
 }
