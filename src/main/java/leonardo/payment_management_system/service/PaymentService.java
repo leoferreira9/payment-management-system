@@ -87,13 +87,17 @@ public class PaymentService {
         return mapper.toDto(payment);
     }
 
+    @Transactional
     public PaymentDTO updatePayment(Long id, UpdatePaymentDTO dto){
         Payment payment = findPaymentOrThrow(id);
 
         if(!payment.getStatus().equals(PaymentStatus.PENDING)) throw new FailedToUpdateEntity("Cannot update, payment already paid or cancelled.");
+        if(dto.getValue() == null && dto.getDescription() == null) throw new FailedToUpdateEntity("At least one field must be entered for update.");
 
         String description = dto.getDescription() != null ? dto.getDescription() : payment.getDescription();
         BigDecimal value = dto.getValue() != null ? dto.getValue() : payment.getValue();
+
+        if(description.equals(payment.getDescription()) && value.equals(payment.getValue())) throw new FailedToUpdateEntity("Unable to update, new data must be different from data already saved");
 
         payment.setDescription(description);
         payment.setValue(value);
