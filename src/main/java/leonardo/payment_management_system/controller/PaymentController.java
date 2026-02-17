@@ -44,7 +44,7 @@ public class PaymentController {
     }
 
     @Operation(summary = "Payments Summary", description = "Return payments summary by status")
-    @ApiResponse(responseCode = "201", description = "payments summary successfully returned")
+    @ApiResponse(responseCode = "200", description = "payments summary successfully returned")
     @GetMapping("/summary")
     public ResponseEntity<PaymentSummaryDTO> summary(){
         return ResponseEntity.ok().body(paymentService.paymentSummary());

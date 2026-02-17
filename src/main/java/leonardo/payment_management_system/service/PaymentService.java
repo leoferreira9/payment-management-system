@@ -123,9 +123,13 @@ public class PaymentService {
         List<Object[]> list = paymentRepository.paymentSummary();
 
         for(Object[] obj: list){
-            if(obj[0].equals(PaymentStatus.PENDING)) pending = (BigDecimal) obj[1];
-            if(obj[0].equals(PaymentStatus.PAID)) paid = (BigDecimal) obj[1];
-            if(obj[0].equals(PaymentStatus.CANCELLED)) cancelled = (BigDecimal) obj[1];
+
+            PaymentStatus status = (PaymentStatus) obj[0];
+            BigDecimal total = obj[1] != null ? (BigDecimal) obj[1] : BigDecimal.ZERO;
+
+            if(status == PaymentStatus.PENDING) pending = total;
+            if(status == PaymentStatus.PAID) paid = total;
+            if(status == PaymentStatus.CANCELLED) cancelled = total;
         }
 
         return new PaymentSummaryDTO(pending, paid, cancelled);
