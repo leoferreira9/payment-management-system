@@ -55,7 +55,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payment successfully found"),
             @ApiResponse(responseCode = "404", description = "payment not found")
     })
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<PaymentDTO> findById(
             @Parameter(description = "Payment ID to be found", example = "1", required = true)
             @PathVariable Long id){
@@ -78,7 +78,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payment successfully confirmed"),
             @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
     })
-    @PostMapping("/{paymentId}/confirm")
+    @PostMapping("/{paymentId:\\d+}/confirm")
     public ResponseEntity<PaymentDTO> confirm(
             @Parameter(description = "payment id", example = "1", required = true)
             @PathVariable Long paymentId
@@ -91,7 +91,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payment successfully cancelled"),
             @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
     })
-    @PostMapping("/{paymentId}/cancel")
+    @PostMapping("/{paymentId:\\d+}/cancel")
     public ResponseEntity<PaymentDTO> cancel(
             @Parameter(description = "payment id", example = "1", required = true)
             @PathVariable Long paymentId
@@ -104,7 +104,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payment successfully refunded"),
             @ApiResponse(responseCode = "409", description = "Invalid payment status transition")
     })
-    @PostMapping("/{paymentId}/refund")
+    @PostMapping("/{paymentId:\\d+}/refund")
     public ResponseEntity<PaymentDTO> refund(
             @Parameter(description = "payment id", example = "1", required = true)
             @PathVariable Long paymentId
@@ -117,7 +117,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "payment successfully updated"),
             @ApiResponse(responseCode = "409", description = "Invalid payment update data")
     })
-    @PatchMapping("/{paymentId}/update")
+    @PatchMapping("/{paymentId:\\d+}/update")
     public ResponseEntity<PaymentDTO> update(
             @Parameter(description = "payment id", example = "1", required = true)
             @PathVariable Long paymentId,
