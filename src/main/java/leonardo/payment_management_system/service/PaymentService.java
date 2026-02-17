@@ -3,6 +3,7 @@ package leonardo.payment_management_system.service;
 import jakarta.transaction.Transactional;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.dto.payment.PaymentSummaryDTO;
 import leonardo.payment_management_system.dto.payment.UpdatePaymentDTO;
 import leonardo.payment_management_system.entity.Payment;
 import leonardo.payment_management_system.enums.PaymentRecordStatus;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -111,5 +113,21 @@ public class PaymentService {
         paymentRecordService.createRecord(savedPayment);
 
         return mapper.toDto(savedPayment);
+    }
+
+    public PaymentSummaryDTO paymentSummary(){
+        BigDecimal pending = BigDecimal.ZERO;
+        BigDecimal paid = BigDecimal.ZERO;
+        BigDecimal cancelled = BigDecimal.ZERO;
+
+        List<Object[]> list = paymentRepository.paymentSummary();
+
+        for(Object[] obj: list){
+            if(obj[0].equals(PaymentStatus.PENDING)) pending = (BigDecimal) obj[1];
+            if(obj[0].equals(PaymentStatus.PAID)) paid = (BigDecimal) obj[1];
+            if(obj[0].equals(PaymentStatus.CANCELLED)) cancelled = (BigDecimal) obj[1];
+        }
+
+        return new PaymentSummaryDTO(pending, paid, cancelled);
     }
 }

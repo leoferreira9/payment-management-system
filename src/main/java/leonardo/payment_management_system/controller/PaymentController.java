@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import leonardo.payment_management_system.common.pagination.PageResponse;
 import leonardo.payment_management_system.dto.payment.CreatePaymentDTO;
 import leonardo.payment_management_system.dto.payment.PaymentDTO;
+import leonardo.payment_management_system.dto.payment.PaymentSummaryDTO;
 import leonardo.payment_management_system.dto.payment.UpdatePaymentDTO;
 import leonardo.payment_management_system.enums.PaymentStatus;
 import leonardo.payment_management_system.enums.PaymentType;
@@ -40,6 +41,13 @@ public class PaymentController {
         PaymentDTO paymentDTO = paymentService.create(dto);
         URI location = URI.create("/payments/" + paymentDTO.getId());
         return ResponseEntity.created(location).body(paymentDTO);
+    }
+
+    @Operation(summary = "Payments Summary", description = "Return payments summary by status")
+    @ApiResponse(responseCode = "201", description = "payments summary successfully returned")
+    @GetMapping("/summary")
+    public ResponseEntity<PaymentSummaryDTO> summary(){
+        return ResponseEntity.ok().body(paymentService.paymentSummary());
     }
 
     @Operation(summary = "Find payment", description = "Return a payment by its ID")
