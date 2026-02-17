@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class PaymentService {
@@ -97,12 +98,18 @@ public class PaymentService {
         String description = dto.getDescription() != null ? dto.getDescription() : payment.getDescription();
         BigDecimal value = dto.getValue() != null ? dto.getValue() : payment.getValue();
 
-        if(description.equals(payment.getDescription()) && value.equals(payment.getValue())) throw new FailedToUpdateEntity("Unable to update, new data must be different from data already saved");
+        boolean sameDescription = Objects.equals(payment.getDescription(), description);
+        boolean sameValue = value.compareTo(payment.getValue()) == 0;
 
-        payment.setDescription(description);
-        payment.setValue(value);
+        if(sameDescription && sameValue) throw new FailedToUpdateEntity("Unable to update, new data must be different from data already saved");
+
+        if(!sameDescription) payment.setDescription(description);
+
+        if(!sameValue) payment.setValue(value);
+
         Payment savedPayment = paymentRepository.save(payment);
-        paymentRecordService.createRecord(payment);
+        paymentRecordService.createRecord(savedPayment);
+
         return mapper.toDto(savedPayment);
     }
 }
