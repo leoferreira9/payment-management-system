@@ -7,6 +7,7 @@ import leonardo.payment_management_system.exception.InvalidPaymentStatusTransiti
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -16,68 +17,45 @@ import java.time.Instant;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFound.class)
-    public ResponseEntity<ErrorResponse> entityNotFoundHandler(EntityNotFound ex, HttpServletRequest request){
+    private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request){
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
+                status.value(),
+                message,
                 Instant.now(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                status.getReasonPhrase(),
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return ResponseEntity.status(status.value()).body(errorResponse);
+    }
+
+    @ExceptionHandler(EntityNotFound.class)
+    public ResponseEntity<ErrorResponse> entityNotFoundHandler(EntityNotFound ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(FailedToUpdateEntity.class)
     public ResponseEntity<ErrorResponse> failedToUpdateHandler(FailedToUpdateEntity ex, HttpServletRequest request){
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                ex.getMessage(),
-                Instant.now(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(InvalidPaymentStatusTransitionException.class)
     public ResponseEntity<ErrorResponse> invalidPaymentStatusTransitionHandler(InvalidPaymentStatusTransitionException ex, HttpServletRequest request){
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                ex.getMessage(),
-                Instant.now(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> httpMessageNotReadableHandler(HttpMessageNotReadableException ex, HttpServletRequest request){
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> NoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request){
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                request.getRequestURI()
-        );
+    public ResponseEntity<ErrorResponse> noResourceFoundException(NoResourceFoundException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidHandler(MethodArgumentNotValidException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 }
