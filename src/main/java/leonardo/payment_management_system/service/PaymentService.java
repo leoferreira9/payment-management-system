@@ -58,6 +58,7 @@ public class PaymentService {
         return mapper.toDto(savedPayment);
 
     }
+
     public PaymentDTO findById(Long id){
         Payment payment = findPaymentOrThrow(id);
         return mapper.toDto(payment);
@@ -84,7 +85,7 @@ public class PaymentService {
     @Transactional
     public PaymentDTO confirmPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.PAID);
-        logger.info("Payment with id {} changed status from PENDING to {}.", payment.getId(), payment.getStatus());
+        logger.info("Payment with id {} changed status to {}.", payment.getId(), payment.getStatus());
         return mapper.toDto(payment);
     }
 
