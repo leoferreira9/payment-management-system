@@ -75,16 +75,19 @@ public class PaymentService {
         return payment.map(mapper::toDto);
     }
 
+    @Transactional
     public PaymentDTO confirmPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.PAID);
         return mapper.toDto(payment);
     }
 
+    @Transactional
     public PaymentDTO cancelPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
         return mapper.toDto(payment);
     }
 
+    @Transactional
     public PaymentDTO refundPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.REFUNDED);
         return mapper.toDto(payment);
