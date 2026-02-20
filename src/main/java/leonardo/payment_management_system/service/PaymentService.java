@@ -13,6 +13,8 @@ import leonardo.payment_management_system.exception.EntityNotFound;
 import leonardo.payment_management_system.exception.FailedToUpdateEntity;
 import leonardo.payment_management_system.mapper.PaymentMapper;
 import leonardo.payment_management_system.repository.PaymentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,8 @@ public class PaymentService {
         return paymentRepository.findById(id).orElseThrow(() -> new EntityNotFound("Payment not found with ID: " + id));
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+
     @Transactional
     public PaymentDTO create(CreatePaymentDTO dto){
         Payment payment = mapper.toEntity(dto);
@@ -49,6 +53,8 @@ public class PaymentService {
         payment.setPaymentDeadline(dto.getPaymentType().calculateDeadline(LocalDateTime.now()));
         Payment savedPayment = paymentRepository.save(payment);
         paymentRecordService.createRecord(savedPayment);
+
+        logger.info("Payment created with id {} and status {}.", savedPayment.getId(), savedPayment.getStatus());
         return mapper.toDto(savedPayment);
 
     }
@@ -78,18 +84,21 @@ public class PaymentService {
     @Transactional
     public PaymentDTO confirmPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.PAID);
+        logger.info("Payment with id {} changed status from PENDING to {}.", payment.getId(), payment.getStatus());
         return mapper.toDto(payment);
     }
 
     @Transactional
     public PaymentDTO cancelPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.CANCELLED);
+        logger.info("Payment with id {} was successfully cancelled.", payment.getId());
         return mapper.toDto(payment);
     }
 
     @Transactional
     public PaymentDTO refundPayment(Long id){
         Payment payment = paymentRecordService.create(id, PaymentRecordStatus.REFUNDED);
+        logger.info("Payment with id {} was successfully refunded.", payment.getId());
         return mapper.toDto(payment);
     }
 
@@ -115,6 +124,7 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         paymentRecordService.createRecord(savedPayment);
 
+        logger.info("Payment with id {} was successfully updated.", payment.getId());
         return mapper.toDto(savedPayment);
     }
 
